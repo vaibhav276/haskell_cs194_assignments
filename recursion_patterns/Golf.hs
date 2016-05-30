@@ -12,3 +12,11 @@ getEvery n xs
    | n > length xs = []
    | otherwise     = head (drop (n - 1) xs) : ( getEvery n ( drop n xs) )
 
+-- | @localMaxima xs@ returns a list of local maximas in a list
+--   A local maxima is an element which is larger than its adjescent elements
+localMaxima :: [Integer] -> [Integer]
+localMaxima xs 
+   | length xs < 3 = []
+   | otherwise     = 
+   (if b > a && b > head c then [b] else []) ++ localMaxima (tail xs)
+   where (a:b:c) = take 3 xs
