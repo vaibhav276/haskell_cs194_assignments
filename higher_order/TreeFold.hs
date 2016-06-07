@@ -105,5 +105,9 @@ h' t = h t
 --   Useful for debugging
 str :: (Show a) => Tree a -> String
 str Leaf = "x"
-str (Node _ ll mm rr) = show mm ++ "(" ++ str ll ++ "," ++ str rr ++ ")"
+str t@(Node _ ll mm rr) = show mm ++ 
+                           "{bf=" ++ 
+                           (show (balanceFactor t)) ++ 
+                           "}" ++
+                           "(" ++ str ll ++ "," ++ str rr ++ ")"
 
