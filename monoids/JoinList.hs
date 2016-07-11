@@ -1,9 +1,13 @@
 {-# OPTIONS_GHC -Wall #-}
+{-# LANGUAGE FlexibleInstances #-}
 
 module JoinList where
 
 import Data.Monoid
 import Sized
+import Scrabble
+import Buffer
+import Editor
 
 -- | @JoinList is an efficient way to store lists
 --   by expressing every list as a combination of sublists
@@ -71,3 +75,24 @@ takeJ i (Append _ l r)
    | getSize (size (tag l)) <= i =
       takeJ (i - getSize (size (tag l))) r
    | otherwise          = takeJ i l
+
+
+scoreLine :: String -> JoinList Score String
+scoreLine l = Single (scoreString l) l
+
+-- Buffer instance that contains array of JoinList (Score, Size) type
+instance Buffer (JoinList (Score, Size) String) where
+   fromString = foldr1 (+++) . map (\l -> Single (scoreString l, Size 1) l) . lines
+   toString = concat. jlToList
+   line = indexJ
+   replaceLine n s l = takeJ (n-1) l +++ fromString s +++ dropJ n l
+   numLines Empty = 0
+   numLines (Single (_, Size s) _) = s
+   numLines (Append (_, Size s) _ _) = s
+   value Empty = 0
+   value (Single (Score s, _) _) = s
+   value (Append (Score s, _) _ _) = s
+
+-- main function: See StringBufEditor.hs
+main :: IO()
+main = runEditor editor (fromString "Welcome, enter ? for help" :: JoinList (Score, Size) String)
